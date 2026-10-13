@@ -1,0 +1,35 @@
+name: EA2 - Flujo de modelos
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  ejecutar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ejecutar el notebook completo
+        run: |
+          jupyter nbconvert --to notebook --execute --inplace src/Actividades_Evaluativas/EA2_modelos.ipynb
+
+      - name: Publicar el resumen como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: resumen-modelos
+          path: |
+            src/Actividades_Evaluativas/reportes/
+            src/Actividades_Evaluativas/EA2_modelos.ipynb
