@@ -22,6 +22,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Limpiar datos y reportes generados
+        run: |
+          rm -rf src/Actividades_Evaluativas/datos src/Actividades_Evaluativas/reportes
+
       - name: Ejecutar el notebook completo
         run: |
           jupyter nbconvert --to notebook --execute --inplace src/Actividades_Evaluativas/EA2_modelos.ipynb
@@ -30,6 +34,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: resumen-modelos
-          path: |
+          path: 
             src/Actividades_Evaluativas/reportes/
             src/Actividades_Evaluativas/EA2_modelos.ipynb
