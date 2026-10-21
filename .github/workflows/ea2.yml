@@ -57,3 +57,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/Actividades_Evaluativas/
+
+          if git diff --cached --quiet; then
+            echo "No se generaron cambios."
+            exit 0
+          fi
+
+          git commit -m "chore: actualizar resultados de las actividades EA1 y EA2 [skip ci]"
+          git push origin HEAD:main
