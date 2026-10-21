@@ -54,8 +54,6 @@ El entorno virtual se activa con `source` (el prompt muestra `(.venv)`). Tambié
 
 El workflow `.github/workflows/ea2.yml` se ejecuta en cada `push` a `main`: instala las dependencias, borra los resultados anteriores, ejecuta los notebooks de la EA1 y la EA2 completos (descarga del dataset, transformaciones, preprocesamiento, entrenamiento y evaluación de ambos modelos), publica los resúmenes `.txt` y los notebooks ejecutados como artefacto descargable (`resumen-modelos`) y guarda los resultados generados en el repositorio con un commit automático de `github-actions[bot]`.
 
-- **Ejecución exitosa:** (https://github.com/Mayerly3suarez/ML_2026Q4/actions/runs/39536285384)
-
 Si GitHub no muestra algún notebook, recargue la página o descargue el artefacto de la ejecución.
 
 ## Ubicación de las evidencias
