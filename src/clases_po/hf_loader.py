@@ -1,8 +1,9 @@
+"""Carga datasets de Hugging Face y, opcionalmente, los guarda en disco."""
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Literal
-from datasets import load_dataset
+from datasets import load_dataset  
 import pandas as pd
 
 FileType = Literal["csv", "json", "parquet", "xlsx"]
@@ -114,4 +115,3 @@ class HFDatasetLoader:
             df.to_parquet(self.filename, index=False)
         elif file_type == "xlsx":
             df.to_excel(self.filename, index=False)
-            
