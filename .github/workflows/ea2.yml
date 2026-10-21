@@ -5,12 +5,21 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: ea2-main
+  cancel-in-progress: false
+
 jobs:
   ejecutar:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar el repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -26,7 +35,11 @@ jobs:
         run: |
           rm -rf src/Actividades_Evaluativas/datos src/Actividades_Evaluativas/reportes
 
-      - name: Ejecutar el notebook completo
+      - name: Ejecutar el notebook de la EA1
+        run: |
+          jupyter nbconvert --to notebook --execute --inplace src/Actividades_Evaluativas/EA1_carga_datos.ipynb
+
+      - name: Ejecutar el notebook de la EA2
         run: |
           jupyter nbconvert --to notebook --execute --inplace src/Actividades_Evaluativas/EA2_modelos.ipynb
 
@@ -34,6 +47,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: resumen-modelos
-          path: 
+          path: |
             src/Actividades_Evaluativas/reportes/
+            src/Actividades_Evaluativas/EA1_carga_datos.ipynb
             src/Actividades_Evaluativas/EA2_modelos.ipynb
+
+      - name: Confirmar resultados generados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/Actividades_Evaluativas/
