@@ -1,6 +1,6 @@
 RESUMEN AUTOMÁTICO - EA2 MODELOS DE PREDICCIÓN Y CLASIFICACIÓN
 ======================================================================
-Fecha de ejecución: 2026-10-27 00:50:23
+Fecha de ejecución: 2026-10-27 02:01:24
 
 1. DATASET
 Identificador: ADAMlam-16/coffee-data_eda-project
