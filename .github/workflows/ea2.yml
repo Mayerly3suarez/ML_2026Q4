@@ -31,10 +31,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Limpiar datos, reportes, gráficas y modelos generados
+      - name: Limpiar datos, reportes, gráficas y modelos generados (.pkl)
         run: |
           cd src/Actividades_Evaluativas
-          rm -rf datos reportes graficas modelos
+          rm -rf datos reportes graficas modelos entrenamiento
 
       - name: Ejecutar el notebook de la EA1
         run: |
