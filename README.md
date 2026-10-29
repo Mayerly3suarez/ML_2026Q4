@@ -31,7 +31,7 @@ src/clases_po/
 src/Actividades_Evaluativas/
   EA1_carga_datos.ipynb              EA1: carga, transformaciones y resumen
   EA2_modelos.ipynb                  EA2: preprocesamiento, regresión y clasificación
-  EA3_modelo.ipynb                   EA3: pregunta de negocio, Random Forest y resumen
+  EA3_modelo.ipynb                   EA3: Random Forest, regresión lineal y resumen
   EA3_hallazgos.md                   EA3: documento de hallazgos y recomendaciones
   datos/                             Copias de los datasets generadas al ejecutar
   reportes/                          Resúmenes .txt generados al ejecutar
@@ -69,13 +69,13 @@ El workflow `.github/workflows/ea2.yml` se ejecuta en cada `push` a `main`:
 2. Borra los datos, reportes, gráficas y modelos de ejecuciones anteriores.
 3. Ejecuta completos los notebooks de la EA1, la EA2 y la EA3: descarga de los datasets, preprocesamiento, entrenamiento y evaluación de los modelos, y generación de los resúmenes `.txt` y las gráficas.
 4. Publica los resúmenes, las gráficas y los notebooks ejecutados como artefacto descargable (`resumen-actividades`).
-5. Guarda los resultados generados en el repositorio con un commit automático de `github-actions[bot]`. Los modelos entrenados (`.pkl`) no se suben.
+5. Guarda los resultados generados en el repositorio con un commit automático de `github-actions[bot]`. Los modelos entrenados (`.pkl` en `modelos/` y `entrenamiento/`) no se suben.
 
 Si GitHub no muestra algún notebook, recargue la página o descargue el artefacto de la ejecución.
 
 ---
 
-## EA3 – Aprendizaje supervisado
+## EA3 – Aprendizaje supervisado (clasificación y regresión)
 
 ### Pregunta de negocio
 
@@ -83,15 +83,18 @@ Si GitHub no muestra algún notebook, recargue la página o descargue el artefac
 
 - **Quién necesita la respuesta:** el área de promoción y prevención de una EPS.
 - **Qué decisión apoya:** a quién contactar primero para los programas de prevención y en qué hábitos enfocar las campañas.
+- **Cómo se responde:** con dos modelos supervisados sobre el mismo dataset: un modelo de **clasificación** (Random Forest) identifica **quién** tiene obesidad, y un modelo de **regresión lineal** estima el **índice de masa corporal (IMC)** y muestra **cuántos puntos** suma o resta cada hábito.
 - **Por qué este dataset permite responderla:** cada fila es una persona con sus hábitos (comida rápida, verduras, número de comidas, agua, actividad física, pantallas, alcohol, transporte e historial familiar) y su nivel de obesidad. Eso permite relacionar los hábitos con la obesidad sin necesidad de pesar ni medir a la persona.
 
 ### Variables
 
-- **Objetivo:** `obesidad` = 1 si el nivel es `Obesity_Type_I`, `Obesity_Type_II` u `Obesity_Type_III`; 0 en los demás casos (46,6 % con obesidad).
+- **Objetivo de la clasificación:** `obesidad` = 1 si el nivel es `Obesity_Type_I`, `Obesity_Type_II` u `Obesity_Type_III`; 0 en los demás casos (46,6 % con obesidad).
+- **Objetivo de la regresión:** `imc` = peso / estatura² (kg/m²), una variable numérica continua (promedio 29,8; desviación 8,0).
 - **Predictoras (14):** edad, frecuencia de verduras, comidas principales, agua, actividad física, tiempo frente a pantallas, come entre comidas, alcohol, historial familiar, comida calórica, fuma, controla calorías, género y transporte.
-- **Excluidas por fuga de información:** estatura, peso y nivel de obesidad. El nivel de obesidad del estudio se calculó con el índice de masa corporal (peso / estatura²); si el modelo recibiera esas columnas, calcularía la respuesta con la fórmula en lugar de aprenderla de los hábitos.
+- **En la regresión,** `genero` y `transporte` se convierten a columnas 0/1 (`es_hombre` y una columna por medio de transporte, con el automóvil como referencia), porque la clase `RegresionLineal` solo recibe números. Quedan 17 predictoras.
+- **Excluidas por fuga de información:** estatura, peso y nivel de obesidad (y `obesidad` en la regresión). El nivel de obesidad del estudio se calculó con el índice de masa corporal (peso / estatura²); si el modelo recibiera esas columnas, calcularía la respuesta con la fórmula en lugar de aprenderla de los hábitos.
 
-### Tipo de aprendizaje y modelo
+### Modelo de clasificación: Random Forest
 
 **Supervisado (clasificación).** La respuesta es conocida en los datos: cada persona ya está marcada con o sin obesidad. El modelo aprende de esos ejemplos y luego clasifica personas nuevas.
 
@@ -141,6 +144,39 @@ Los tres primeros se eligieron con **validación cruzada de 5 particiones** sobr
 - La importancia de variables tiende a favorecer variables con muchos valores distintos, como la edad.
 - Muestra asociaciones, no causas.
 
+### Modelo de regresión lineal: IMC
+
+**Supervisado (regresión).** Predice un número continuo: el IMC. Se usó la clase `RegresionLineal` vista en clase y, como en la semana 2, primero una regresión simple (con la variable más correlacionada con el IMC, `historial_familiar`) y luego una múltiple con las 17 predictoras.
+
+#### Cómo funciona la regresión lineal
+
+1. Supone que el IMC se puede escribir como una suma: `IMC = b + w1·variable1 + w2·variable2 + …`, donde `b` es el intercepto y cada `w` es el coeficiente de una variable.
+2. Con los datos de entrenamiento, busca los valores de `b` y de cada `w` que hacen **más pequeña la suma de los errores al cuadrado** entre el IMC real y el estimado (mínimos cuadrados).
+3. Para una persona nueva, multiplica cada variable por su coeficiente, suma todo y obtiene el IMC estimado.
+4. Cada coeficiente se interpreta como **cuántos puntos de IMC cambia la estimación cuando esa variable sube una unidad** y las demás se mantienen iguales.
+
+#### Parámetros y configuración
+
+| Parámetro | Qué controla | Valor |
+|---|---|---|
+| `fit_intercept` | Si se calcula el intercepto `b` | `True` (predeterminado) |
+| Regularización | Penalizar coeficientes grandes | Ninguna (`LinearRegression` predeterminada) |
+| `test_size` | Proporción de datos de prueba | 0,2 |
+| `random_state` | Semilla de la división | 42 |
+
+No se escalaron las variables: así cada coeficiente queda en sus propias unidades (puntos de IMC por año, por nivel o por tener la característica). La comparación entre la regresión simple y la múltiple, con R² de validación cruzada de 5 particiones, se usa como evidencia de que conviene usar todas las variables.
+
+#### Ventajas y limitaciones
+
+**Ventajas**
+- Es fácil de interpretar: cada coeficiente dice cuánto suma o resta cada hábito al IMC.
+- Es rápida de entrenar y no tiene hiperparámetros que ajustar.
+
+**Limitaciones**
+- Supone relaciones en línea recta y efectos que se suman por separado; no capta combinaciones complejas entre hábitos.
+- Es sensible a valores extremos y a variables muy relacionadas entre sí.
+- Los coeficientes de categorías con pocas personas (por ejemplo, bicicleta o moto) son poco confiables.
+
 ### Resultados (conjunto de prueba, 418 personas)
 
 | Modelo | Exactitud | Precisión | Recall | F1 |
@@ -150,7 +186,16 @@ Los tres primeros se eligieron con **validación cruzada de 5 particiones** sobr
 | **Random Forest ajustado (umbral 0,4)** | **0,912** | **0,899** | **0,913** | **0,906** |
 | Regresión logística balanceada | 0,758 | 0,698 | 0,851 | 0,767 |
 
-Con el modelo final, de cada 100 personas con obesidad se identifican 91, y de cada 100 personas que se recomienda invitar, 90 realmente tienen obesidad.
+**Clasificación:** con el modelo final, de cada 100 personas con obesidad se identifican 91, y de cada 100 personas que se recomienda invitar, 90 realmente tienen obesidad.
+
+**Regresión lineal (IMC):**
+
+| Modelo | R² validación cruzada | R² prueba | MAE (puntos de IMC) | RMSE |
+|---|---|---|---|---|
+| Simple (`historial_familiar`) | 0,22 | 0,28 | 5,97 | 7,27 |
+| **Múltiple (17 variables)** | **0,41** | **0,53** | **4,75** | **5,88** |
+
+Los hábitos explican entre el 41 % y el 53 % de las diferencias de IMC, con un error promedio de 4,75 puntos. El historial familiar es el factor más fuerte (+7,5 puntos de IMC). La regresión sirve para entender el efecto de cada hábito; para decidir a quién contactar se usa el Random Forest.
 
 **Documento de hallazgos con la respuesta a la pregunta, limitaciones y recomendaciones:** [`src/Actividades_Evaluativas/EA3_hallazgos.md`](src/Actividades_Evaluativas/EA3_hallazgos.md)
 
@@ -173,8 +218,10 @@ Con el modelo final, de cada 100 personas con obesidad se identifican 91, y de c
 | EA3 – Estado inicial de los datos | `src/Actividades_Evaluativas/reportes/EA3_reporte_dataframe_inicial.txt` |
 | EA3 – Preprocesamiento (antes y después) | `EA3_modelo.ipynb`, sección 2 |
 | EA3 – Clase del modelo | `src/clases_po/clasificador_tabular.py` |
-| EA3 – Selección del modelo y ajuste de parámetros | `EA3_modelo.ipynb`, sección 3 |
-| EA3 – Métricas, matriz de confusión, importancia y umbral | `EA3_modelo.ipynb`, sección 4 |
+| EA3 – Clasificación: selección del modelo y ajuste de parámetros | `EA3_modelo.ipynb`, sección 3 |
+| EA3 – Clasificación: métricas, matriz de confusión, importancia y umbral | `EA3_modelo.ipynb`, sección 4 |
+| EA3 – Regresión lineal del IMC | `EA3_modelo.ipynb`, sección 5 |
+| EA3 – Reporte de la regresión lineal | `src/Actividades_Evaluativas/reportes/EA3_reporte_regresion_lineal.txt` |
 | EA3 – Gráficas | `src/Actividades_Evaluativas/graficas/` |
 | EA3 – Resumen automático | `src/Actividades_Evaluativas/reportes/EA3_resumen_modelo.txt` |
 | EA3 – Documento de hallazgos | `src/Actividades_Evaluativas/EA3_hallazgos.md` |
