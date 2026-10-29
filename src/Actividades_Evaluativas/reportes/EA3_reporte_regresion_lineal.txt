@@ -1,0 +1,112 @@
+REPORTE DE REGRESIÓN LINEAL
+======================================================================
+Columnas predictoras (X): ['edad', 'frecuencia_verduras', 'comidas_principales', 'agua', 'actividad_fisica', 'tiempo_pantallas', 'come_entre_comidas', 'alcohol', 'historial_familiar', 'comida_calorica', 'fuma', 'controla_calorias', 'es_hombre', 'transporte_Bike', 'transporte_Motorbike', 'transporte_Public_Transportation', 'transporte_Walking']
+Columna objetivo (y): imc
+Test size: 0.2
+Random state: 42
+
+MODELO
+----------------------------------------------------------------------
+Ruta del modelo: entrenamiento/20261029_170331_945700_modelo.pkl
+Parámetros: {'w': [0.30577006847624905, 2.8174197229772995, 0.5395875185721152, 0.5542768018697433, -0.8795194926188366, -0.151337088080017, -3.4468903152421926, 1.6775669154093633, 7.461758150831951, 2.5185534259587357, -1.8288811849639743, -2.204046275449188, -0.3496548141641129, 2.863138610684864, 4.330095543209783, 4.163998897579412, 1.4767613998393065], 'b': 5.3782955572511}
+
+MÉTRICAS DE EVALUACIÓN
+----------------------------------------------------------------------
+MAE: 4.753842
+RMSE: 5.884029
+R2: 0.531638
+
+DIMENSIONES DE LOS DATOS
+----------------------------------------------------------------------
+DataFrame original: (2087, 24)
+X: (2087, 17)
+y: (2087,)
+X_train: (1669, 17)
+X_test: (418, 17)
+y_train: (1669,)
+y_test: (418,)
+
+REPORTE DEL DATAFRAME
+----------------------------------------------------------------------
+REPORTE DEL DATAFRAME
+============================================================
+Filas: 2087
+Columnas: 24
+Duplicados: 3
+
+Columnas y tipos:
+- genero: str
+- edad: int64
+- estatura: float64
+- peso: float64
+- historial_familiar: int64
+- comida_calorica: int64
+- frecuencia_verduras: int64
+- comidas_principales: int64
+- come_entre_comidas: int64
+- fuma: int64
+- agua: int64
+- controla_calorias: int64
+- actividad_fisica: int64
+- tiempo_pantallas: int64
+- alcohol: int64
+- transporte: str
+- nivel_obesidad: str
+- obesidad: int64
+- imc: float64
+- es_hombre: int64
+- transporte_Bike: int64
+- transporte_Motorbike: int64
+- transporte_Public_Transportation: int64
+- transporte_Walking: int64
+
+Valores nulos por columna:
+- genero: 0
+- edad: 0
+- estatura: 0
+- peso: 0
+- historial_familiar: 0
+- comida_calorica: 0
+- frecuencia_verduras: 0
+- comidas_principales: 0
+- come_entre_comidas: 0
+- fuma: 0
+- agua: 0
+- controla_calorias: 0
+- actividad_fisica: 0
+- tiempo_pantallas: 0
+- alcohol: 0
+- transporte: 0
+- nivel_obesidad: 0
+- obesidad: 0
+- imc: 0
+- es_hombre: 0
+- transporte_Bike: 0
+- transporte_Motorbike: 0
+- transporte_Public_Transportation: 0
+- transporte_Walking: 0
+
+Estadísticas numéricas:
+           edad  estatura      peso  historial_familiar  comida_calorica  frecuencia_verduras  comidas_principales  come_entre_comidas      fuma      agua  controla_calorias  actividad_fisica  tiempo_pantallas   alcohol  obesidad       imc  es_hombre  transporte_Bike  transporte_Motorbike  transporte_Public_Transportation  transporte_Walking
+count  2087.000  2087.000  2087.000            2087.000         2087.000             2087.000             2087.000            2087.000  2087.000  2087.000           2087.000          2087.000          2087.000  2087.000  2087.000  2087.000   2087.000         2087.000              2087.000                          2087.000            2087.000
+mean     24.356     1.703    86.859               0.825            0.884                2.426                2.703               1.146     0.021     2.011              0.046             1.009             0.670     0.730     0.466    29.766      0.504            0.003                 0.005                             0.747               0.026
+std       6.380     0.093    26.191               0.380            0.321                0.585                0.797               0.459     0.144     0.685              0.210             0.899             0.674     0.517     0.499     8.025      0.500            0.058                 0.072                             0.435               0.160
+min      14.000     1.450    39.000               0.000            0.000                1.000                1.000               0.000     0.000     1.000              0.000             0.000             0.000     0.000     0.000    12.999      0.000            0.000                 0.000                             0.000               0.000
+25%      20.000     1.630    66.000               1.000            1.000                2.000                3.000               1.000     0.000     2.000              0.000             0.000             0.000     0.000     0.000    24.369      0.000            0.000                 0.000                             0.000               0.000
+50%      23.000     1.702    83.101               1.000            1.000                2.000                3.000               1.000     0.000     2.000              0.000             1.000             1.000     1.000     0.000    28.896      1.000            0.000                 0.000                             1.000               0.000
+75%      26.000     1.769   108.016               1.000            1.000                3.000                3.000               1.000     0.000     2.000              0.000             2.000             1.000     1.000     1.000    36.096      1.000            0.000                 0.000                             1.000               0.000
+max      61.000     1.980   173.000               1.000            1.000                3.000                4.000               3.000     1.000     3.000              1.000             3.000             2.000     3.000     1.000    50.812      1.000            1.000                 1.000                             1.000               1.000
+
+PRIMERAS 10 FILAS
+----------------------------------------------------------------------
+genero  edad  estatura       peso  historial_familiar  comida_calorica  frecuencia_verduras  comidas_principales  come_entre_comidas  fuma  agua  controla_calorias  actividad_fisica  tiempo_pantallas  alcohol            transporte      nivel_obesidad  obesidad       imc  es_hombre  transporte_Bike  transporte_Motorbike  transporte_Public_Transportation  transporte_Walking
+Female    21  1.630000  60.000000                   1                1                    3                    3                   3     1     2                  0                 2                 0        1 Public_Transportation       Normal_Weight         0 22.582709          0                0                     0                                 1                   0
+Female    21  1.752531 133.618706                   1                1                    3                    3                   1     0     3                  0                 1                 1        1 Public_Transportation    Obesity_Type_III         1 43.504667          0                0                     0                                 1                   0
+Female    23  1.661715  82.595793                   1                1                    1                    1                   1     0     3                  0                 0                 2        1 Public_Transportation      Obesity_Type_I         1 29.911958          0                0                     0                                 1                   0
+Female    22  1.588046  44.236067                   0                0                    3                    2                   2     0     3                  0                 1                 0        0 Public_Transportation Insufficient_Weight         0 17.540839          0                0                     0                                 1                   0
+  Male    26  1.811602 106.042142                   1                1                    3                    3                   1     0     3                  0                 2                 1        1 Public_Transportation      Obesity_Type_I         1 32.311187          1                0                     0                                 1                   0
+  Male    23  1.754439 119.441207                   1                1                    2                    3                   1     0     2                  0                 2                 1        1 Public_Transportation     Obesity_Type_II         1 38.804102          1                0                     0                                 1                   0
+  Male    33  1.783901 103.771371                   1                1                    3                    2                   1     0     3                  0                 2                 1        1            Automobile      Obesity_Type_I         1 32.608893          1                0                     0                                 0                   0
+  Male    25  1.700000  84.687554                   1                1                    2                    3                   1     0     2                  0                 0                 1        1 Public_Transportation Overweight_Level_II         0 29.303652          1                0                     0                                 1                   0
+Female    26  1.644141 111.942544                   1                1                    3                    3                   1     0     3                  0                 0                 0        1 Public_Transportation    Obesity_Type_III         1 41.411127          0                0                     0                                 1                   0
+Female    23  1.741377  54.877111                   1                1                    3                    3                   2     0     2                  0                 2                 0        0 Public_Transportation Insufficient_Weight         0 18.096960          0                0                     0                                 1                   0
