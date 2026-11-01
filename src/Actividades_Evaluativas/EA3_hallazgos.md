@@ -65,9 +65,13 @@ Se compararon cuatro modelos con 418 personas que el modelo nunca vio durante el
 | **Random Forest (ajustado)** | **0,914** | **0,939** | **0,872** | **0,904** |
 | Regresión logística balanceada | 0,758 | 0,698 | 0,851 | 0,767 |
 
-El **Random Forest ajustado** fue el mejor en todas las métricas. Sus parámetros (`n_estimators=300`, `max_depth=15`, `min_samples_leaf=1`) se eligieron con validación cruzada de 5 particiones, comparando 16 combinaciones solo con los datos de entrenamiento.
+El **Random Forest ajustado** fue el mejor en todas las métricas. Además, supera con amplitud a un modelo "perezoso" que siempre responde "sin obesidad": ese modelo acierta el 53,4 % sin detectar a nadie, mientras que el Random Forest acierta el 91,2 %. Sus parámetros (`n_estimators=300`, `max_depth=15`, `min_samples_leaf=1`) se eligieron con validación cruzada de 5 particiones, comparando 16 combinaciones solo con los datos de entrenamiento.
 
 ![Ajuste de parámetros](graficas/EA3_ajuste_parametros.png)
+
+**¿Ordena bien a las personas por riesgo?** Sí. El **ROC-AUC es 0,969** (0,5 sería azar y 1 sería perfecto) y el **PR-AUC es 0,968**, frente a una tasa base de 0,467. En la práctica, si la EPS ordena a sus afiliados según la probabilidad que da el modelo, las personas con obesidad quedan casi siempre en los primeros lugares de la lista.
+
+![Curvas ROC y precisión-recall](graficas/EA3_roc_pr.png)
 
 ### 2.4 Bajar el umbral a 0,4 encuentra más personas con un costo pequeño
 
@@ -120,6 +124,19 @@ Algunos coeficientes van contra lo esperado: comer entre comidas resta 3,4 punto
 
 ![Coeficientes de la regresión lineal](graficas/EA3_coeficientes_regresion.png)
 
+### 2.6 El modelo detecta mejor a las mujeres que a los hombres
+
+Se revisó si el modelo trata igual a hombres y mujeres (umbral 0,4, 418 personas de prueba):
+
+| Grupo | Personas | Tasa real de obesidad | Marcadas como riesgo | Recall | Precisión |
+|---|---|---|---|---|---|
+| Mujeres | 213 | 42,7 % | 46,0 % | **97,8 %** | 90,8 % |
+| Hombres | 205 | 50,7 % | 48,8 % | **85,6 %** | 89,0 % |
+
+- **Cuando el modelo marca a alguien, acierta igual en ambos grupos** (precisión de 91 % y 89 %).
+- **Pero se le escapan más hombres:** detecta al 98 % de las mujeres con obesidad y solo al 86 % de los hombres. Casi todos los casos que el modelo no detecta son hombres.
+- **Para la EPS, esto significa que un hombre con obesidad tiene más probabilidad de quedar por fuera del programa** que una mujer con obesidad. Una posible explicación está en los datos: en este dataset, los niveles más altos de obesidad se reparten de forma muy desigual entre hombres y mujeres, en parte por los datos sintéticos.
+
 ---
 
 ## 3. ¿Qué tan confiables son los resultados?
@@ -137,8 +154,9 @@ Algunos coeficientes van contra lo esperado: comer entre comidas resta 3,4 punto
 4. **El umbral se eligió con el conjunto de prueba**, como se hizo en clase. Lo ideal sería confirmarlo con datos nuevos, porque los resultados con 0,4 pueden ser un poco optimistas.
 5. **La importancia de variables** que calcula Random Forest tiende a favorecer variables con muchos valores distintos, como la edad. Su peso real puede ser algo menor.
 6. **La regresión lineal supone relaciones en línea recta** y suma los efectos de cada variable por separado. Si los hábitos se combinan de forma más compleja, la recta no lo capta; por eso su error es mayor que el del Random Forest.
-7. **Grupos pequeños.** Algunas categorías tienen muy pocas personas (bicicleta, moto, fumadores, quienes controlan calorías), así que sus coeficientes son poco confiables.
-8. **Población del estudio.** Son personas de Colombia, Perú y México, entre 14 y 61 años. El modelo no está probado en otras edades ni poblaciones.
+7. **Diferencia por género.** El modelo detecta al 98 % de las mujeres con obesidad, pero solo al 86 % de los hombres. Si se usa tal como está, los hombres quedarían en desventaja.
+8. **Grupos pequeños.** Algunas categorías tienen muy pocas personas (bicicleta, moto, fumadores, quienes controlan calorías), así que sus coeficientes son poco confiables.
+9. **Población del estudio.** Son personas de Colombia, Perú y México, entre 14 y 61 años. El modelo no está probado en otras edades ni poblaciones.
 
 ---
 
@@ -150,4 +168,5 @@ Algunos coeficientes van contra lo esperado: comer entre comidas resta 3,4 punto
 4. **Usar cada modelo para lo que sirve:** el Random Forest para decidir a quién contactar, y la regresión lineal para explicar y priorizar los mensajes de las campañas, no para estimar el IMC de una persona.
 5. **No usar el modelo como diagnóstico.** Es un filtro para priorizar. Cada persona marcada debe confirmarse con una valoración de peso y estatura antes de entrar al programa.
 6. **Hacer una prueba piloto con datos reales de la EPS** antes de usarlo de forma masiva, por la limitación de los datos sintéticos, y volver a entrenar el modelo con esos datos.
-7. **Revisar el umbral según la capacidad del programa.** Si hay más cupos y presupuesto, se puede bajar a 0,3 para detectar más personas; si los cupos son pocos, 0,5 reduce las invitaciones innecesarias.
+7. **Corregir la diferencia por género antes de usarlo.** Revisar por separado los resultados de hombres y mujeres y, si se mantiene la brecha, usar un umbral más bajo para los hombres o complementar la encuesta con una medición de peso y estatura en ese grupo, para que no queden por fuera del programa.
+8. **Revisar el umbral según la capacidad del programa.** Si hay más cupos y presupuesto, se puede bajar a 0,3 para detectar más personas; si los cupos son pocos, 0,5 reduce las invitaciones innecesarias.
