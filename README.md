@@ -84,6 +84,7 @@ Si GitHub no muestra algún notebook, recargue la página o descargue el artefac
 - **Quién necesita la respuesta:** el área de promoción y prevención de una EPS.
 - **Qué decisión apoya:** a quién contactar primero para los programas de prevención y en qué hábitos enfocar las campañas.
 - **Cómo se responde:** con dos modelos supervisados sobre el mismo dataset: un modelo de **clasificación** (Random Forest) identifica **quién** tiene obesidad, y un modelo de **regresión lineal** estima el **índice de masa corporal (IMC)** y muestra **cuántos puntos** suma o resta cada hábito.
+- **Nota sobre los modelos:** el modelo principal, elegido de la lista de la actividad, es **Random Forest** (supervisado, clasificación). Además, siguiendo la indicación del docente en el foro de que se debe trabajar un modelo de regresión y uno de clasificación, se incluye una **regresión lineal** del IMC con la clase `RegresionLineal` vista en clase.
 - **Por qué este dataset permite responderla:** cada fila es una persona con sus hábitos (comida rápida, verduras, número de comidas, agua, actividad física, pantallas, alcohol, transporte e historial familiar) y su nivel de obesidad. Eso permite relacionar los hábitos con la obesidad sin necesidad de pesar ni medir a la persona.
 
 ### Variables
@@ -106,6 +107,8 @@ Si GitHub no muestra algún notebook, recargue la página o descargue el artefac
 2. Divide los datos en dos grupos según la respuesta.
 3. Repite la búsqueda dentro de cada grupo, hasta llegar a grupos casi puros o al límite de profundidad.
 4. Para clasificar a una persona nueva, se recorre el árbol respondiendo las preguntas hasta llegar a una hoja, que indica la clase.
+
+**¿Cómo decide cuál es la "mejor" pregunta? Con el índice de Gini.** El índice de Gini mide qué tan mezclado está un grupo: `G = 1 − Σ pₖ²`, donde `pₖ` es la proporción de cada clase. Vale 0 si todas las personas del grupo son de la misma clase y 0,5 si hay mitad y mitad. Para cada pregunta posible, el árbol calcula el Gini promedio de los dos grupos que resultan (ponderado por su tamaño) y elige la que más lo reduce (mayor **ganancia**). En nuestros datos, la primera pregunta es el historial familiar de sobrepeso, porque es la que deja los grupos más puros. El cálculo está en la sección 3.4 del notebook.
 
 El problema de un solo árbol profundo es que **memoriza** el entrenamiento: acierta casi todo con los datos que ya vio, pero se equivoca más con personas nuevas.
 
@@ -219,7 +222,9 @@ Los hábitos explican entre el 41 % y el 53 % de las diferencias de IMC, con un 
 | EA3 – Preprocesamiento (antes y después) | `EA3_modelo.ipynb`, sección 2 |
 | EA3 – Clase del modelo | `src/clases_po/clasificador_tabular.py` |
 | EA3 – Clasificación: selección del modelo y ajuste de parámetros | `EA3_modelo.ipynb`, sección 3 |
+| EA3 – Cómo elige sus preguntas el árbol (índice de Gini) | `EA3_modelo.ipynb`, sección 3.4 |
 | EA3 – Clasificación: métricas, matriz de confusión, importancia y umbral | `EA3_modelo.ipynb`, sección 4 |
+| EA3 – Modelo perezoso, ROC-AUC, PR-AUC y equidad por género | `EA3_modelo.ipynb`, secciones 4.7 a 4.9 |
 | EA3 – Regresión lineal del IMC | `EA3_modelo.ipynb`, sección 5 |
 | EA3 – Reporte de la regresión lineal | `src/Actividades_Evaluativas/reportes/EA3_reporte_regresion_lineal.txt` |
 | EA3 – Gráficas | `src/Actividades_Evaluativas/graficas/` |
