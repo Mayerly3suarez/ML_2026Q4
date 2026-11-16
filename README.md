@@ -131,7 +131,7 @@ Los errores de un árbol se compensan con los aciertos de los demás.
 | `random_state` | Semilla para obtener siempre el mismo resultado | 42 |
 | Umbral | Probabilidad mínima para marcar "con obesidad" | 0,4 |
 
-Los tres primeros se eligieron con **validación cruzada de 5 particiones** sobre el conjunto de entrenamiento, comparando 16 combinaciones (F1 de validación del mejor: 0,912). El umbral se eligió con la regla *mayor recall con precisión de al menos 0,85*, porque para la EPS es más costoso dejar por fuera a una persona con obesidad que invitar a alguien que no lo necesitaba.
+Los tres primeros se eligieron con **validación cruzada de 5 particiones** sobre el conjunto de entrenamiento, comparando 16 combinaciones (F1 de validación del mejor: 0,912). El umbral se eligió con la regla *mayor recall con precisión de al menos 0,85*, porque para la EPS es más costoso dejar por fuera a una persona con obesidad que invitar a alguien que no lo necesitaba. Para elegirlo se usaron las probabilidades de la **validación cruzada de 5 particiones sobre el entrenamiento**, sin tocar el conjunto de prueba; la prueba se usó una sola vez, al final, para medir el modelo con ese umbral.
 
 #### Ventajas y limitaciones
 
