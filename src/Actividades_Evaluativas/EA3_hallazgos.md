@@ -75,15 +75,28 @@ El **Random Forest ajustado** fue el mejor en todas las métricas. Además, supe
 
 ### 2.4 Bajar el umbral a 0,4 encuentra más personas con un costo pequeño
 
-Para la EPS, dejar por fuera a una persona con obesidad (falso negativo) es más costoso que invitar a alguien que no lo necesitaba (falso positivo), que solo cuesta una llamada o una cita de valoración. Por eso se revisó el umbral de decisión:
+Para la EPS, dejar por fuera a una persona con obesidad (falso negativo) es más costoso que invitar a alguien que no lo necesitaba (falso positivo), que solo cuesta una llamada o una cita de valoración. Por eso se revisó el umbral de decisión.
+
+El umbral se eligió **sin usar el conjunto de prueba**: se calcularon las probabilidades con **validación cruzada de 5 particiones sobre el entrenamiento** y se aplicó la regla *mayor recall con una precisión de al menos 0,85*:
+
+| Umbral | Precisión (validación) | Recall (validación) | F1 (validación) |
+|---|---|---|---|
+| 0,30 | 0,814 | 0,960 | 0,881 |
+| 0,35 | 0,845 | 0,951 | 0,895 |
+| **0,40 (recomendado)** | **0,871** | **0,943** | **0,906** |
+| 0,45 | 0,895 | 0,924 | 0,909 |
+| 0,50 (predeterminado) | 0,911 | 0,913 | 0,912 |
+
+El 0,4 es el umbral con más recall que cumple la precisión mínima; el 0,35 se queda justo por debajo (0,845).
+
+Después, **una sola vez**, se midió el modelo en el conjunto de prueba (418 personas, 195 con obesidad):
 
 | Umbral | Precisión | Recall | Personas con obesidad detectadas (de 195) | Invitaciones innecesarias |
 |---|---|---|---|---|
 | 0,5 (predeterminado) | 0,939 | 0,872 | 170 | 11 |
 | **0,4 (recomendado)** | **0,899** | **0,913** | **178** | **20** |
-| 0,3 | 0,839 | 0,933 | 182 | 35 |
 
-Con **0,4**, el modelo encuentra **8 personas más** con obesidad a cambio de **9 invitaciones adicionales** que no eran necesarias. Bajar hasta 0,3 solo agrega 4 personas detectadas, pero suma 15 invitaciones innecesarias más. El umbral 0,4 se eligió con una regla definida en el código: el mayor recall con una precisión de al menos 0,85.
+Con **0,4**, el modelo encuentra **8 personas más** con obesidad a cambio de **9 invitaciones adicionales** que no eran necesarias. El F1 de validación (0,906) y el de prueba (0,906) coinciden, lo que indica que el umbral elegido se sostiene con datos que el modelo no había visto.
 
 ![Precisión y recall según el umbral](graficas/EA3_umbral.png)
 
@@ -143,7 +156,7 @@ Se revisó si el modelo trata igual a hombres y mujeres (umbral 0,4, 418 persona
 
 **Lo que da confianza:**
 - **Los resultados son estables.** En la validación cruzada, el F1 del mejor modelo fue 0,912 con una desviación de apenas 0,008 entre las 5 particiones.
-- **No hay sobreajuste a la prueba.** El F1 en validación (0,912) y en prueba (0,904 con umbral 0,5; 0,906 con umbral 0,4) son casi iguales.
+- **No hay sobreajuste a la prueba.** El F1 en validación y en prueba son casi iguales: 0,912 y 0,904 con umbral 0,5; 0,906 y 0,906 con umbral 0,4. Tanto los parámetros como el umbral se eligieron solo con el entrenamiento, y la prueba se usó una sola vez al final.
 - **No hay fuga de información.** Ninguno de los dos modelos usa el peso, la estatura ni el nivel de obesidad, que son los datos con los que se calculó la respuesta.
 - **La regresión se comporta de forma estable,** pero el R² de prueba (0,53) es mayor que el de validación cruzada (0,41): esa división de prueba resultó algo favorable. El valor más prudente es el de validación cruzada, alrededor de 0,41.
 
@@ -151,7 +164,7 @@ Se revisó si el modelo trata igual a hombres y mujeres (umbral 0,4, 418 persona
 1. **Datos sintéticos.** Según el estudio original, cerca del 77 % de los registros se generó de forma artificial para balancear las clases. Eso puede crear patrones más "limpios" que los reales, así que **el desempeño real podría ser menor**.
 2. **Respuestas autodeclaradas.** Los hábitos los reporta cada persona, y pueden no ser exactos.
 3. **Asociaciones, no causas.** Los modelos dicen qué hábitos acompañan a la obesidad, no que la causen. Algunos resultados van contra lo esperado: quienes comen entre comidas con más frecuencia tienen **menos** obesidad y menor IMC, comer más verduras se asocia con **más** IMC, y fumar con **menos** IMC. Puede deberse a que las personas con obesidad reporten distinto lo que comen, a que ya estén haciendo dieta, a otras variables que no están en los datos, o a los datos sintéticos.
-4. **El umbral se eligió con el conjunto de prueba**, como se hizo en clase. Lo ideal sería confirmarlo con datos nuevos, porque los resultados con 0,4 pueden ser un poco optimistas.
+4. **La precisión mínima de 0,85 es una decisión de negocio.** El umbral se eligió con validación cruzada sobre el entrenamiento, sin usar la prueba, pero la regla depende de cuántas invitaciones innecesarias acepte la EPS. Si cambian los cupos o el costo de cada contacto, conviene volver a aplicarla con otro mínimo.
 5. **La importancia de variables** que calcula Random Forest tiende a favorecer variables con muchos valores distintos, como la edad. Su peso real puede ser algo menor.
 6. **La regresión lineal supone relaciones en línea recta** y suma los efectos de cada variable por separado. Si los hábitos se combinan de forma más compleja, la recta no lo capta; por eso su error es mayor que el del Random Forest.
 7. **Diferencia por género.** El modelo detecta al 98 % de las mujeres con obesidad, pero solo al 86 % de los hombres. Si se usa tal como está, los hombres quedarían en desventaja.
